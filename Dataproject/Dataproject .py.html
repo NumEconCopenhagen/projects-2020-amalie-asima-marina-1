@@ -1,0 +1,177 @@
+#!/usr/bin/env python
+# coding: utf-8
+
+# In the following project, we have chosen to examine GDP per capita in selected countries from the European Union, in the period 2010-2019. Annual growth rates for the whole period are calculated to acess which countries that rise and decline the most in GDP. Givem this accessment, we draw parralels to the population growth in the chosen countries and thereby explain the difference in GDP growth-rates. 
+
+# In[1]:
+
+
+import pandas as pd
+import numpy as np
+import matplotlib.pyplot as plt
+import matplotlib.pyplot as plt; plt.rcdefaults()
+import ipywidgets as widgets
+from matplotlib_venn import venn2 # install with pip install matplotlib-venn
+from pandas_datareader import wb
+
+# autoreload modules when code is run
+get_ipython().run_line_magic('load_ext', 'autoreload')
+get_ipython().run_line_magic('autoreload', '2')
+
+
+# In[2]:
+
+
+filename = 'data/EUGDP.xlsx'
+
+
+# In the following we have a sample of 38 countries, which are located in Europe. 
+
+# In[3]:
+
+
+pd.read_excel(filename)
+
+
+# We will look at the first 10 countries on that list, where we will inspect there 
+
+# In[4]:
+
+
+EU_GDP=pd.read_excel(filename)
+EUgdp=EU_GDP.head(10)
+EUgdp
+
+
+# In[5]:
+
+
+myDict = {}
+for i in range(2010, 2020): # range goes from 2010 to but not including 2017
+    myDict[str(i)] = f'e{i}' 
+myDict
+
+
+# In[7]:
+
+
+EUgdp.rename(columns = myDict, inplace=True)
+EUgdp
+
+
+# In[8]:
+
+
+EUgdp_tall = pd.wide_to_long(EUgdp, stubnames='e', i='Country', j='year')
+EUgdp_tall.head(10);
+
+
+# In[9]:
+
+
+EUgdp_tall = EUgdp_tall.reset_index()
+
+
+# In[10]:
+
+
+EUgdp_tall.loc[EUgdp_tall['Country'] == 'Denmark', :].plot(x='year',y='e')
+
+
+# In[11]:
+
+
+import ipywidgets as widgets
+def plot_e(Dataframe, Country): 
+    I = Dataframe['Country'] == Country
+    
+    ax=Dataframe.loc[I,:].plot(x='year',y='e', style='-o', legend='False')
+    ax.set_ylabel('GDP per capita')
+    ax.set_title("GDP per capita 2010-2019 for selected countries in Europe")
+
+
+# In[12]:
+
+
+widgets.interact(plot_e, 
+    Dataframe = widgets.fixed(EUgdp_tall),
+    Country = widgets.Dropdown(description='Country', options=EUgdp_tall.Country.unique(), value='Denmark')
+                ); 
+
+
+# From the plot above it is evident that severeal countries in the EU experience rising GDP over the couse of nine years. Although it is not all EU countries that have a positive growth in GDP. Greece is one of the few countries in the EU, and the only country in this sample, that have experienced ongoing decline in GDP. From the plot it can be seen that from at least the year 2010, the GDP has been consistently falling up until the year 2016. After this year the economic circumstances change, and the GDP is rising slowly. 
+# To investigate the rate of this decline, it would be interesting to calculate the annual growth rate for GDP for the whole period and thereafter analyze the economic circumstance during the time period and its relation to GDP. 
+
+# In[13]:
+
+
+EUgdp1=EUgdp.copy()
+
+
+# In[14]:
+
+
+def Annual_Growth_rate(EUgdp):
+    return ((EUgdp['e2019']/EUgdp['e2010'])**(1/9)-1)*100
+EUgdp1['Annual growth rate']=EUgdp1.apply(Annual_Growth_rate,axis=1)
+
+
+# In[15]:
+
+
+objects = ('BE', 'BG', 'CZE', 'DNK', 'DE', 'EST', 'IRE', 'GR', 'ESP', 'FRA')
+y_pos = np.arange(len(objects))
+performance = EUgdp1['Annual growth rate']
+
+plt.bar(y_pos, performance, align='center', alpha=0.5)
+plt.xticks(y_pos, objects)
+plt.ylabel('Grwoth rate in pct.')
+plt.title('Annual growth rate in selected EU countries for the period 2010-2019')
+
+plt.show()
+
+
+# From the barplot above that the country with the most rapid growth in GDP is Ireland, and the country with the largest decline is Greece, as earlier mentioned. It would now be interesting to investigate which economic circumstances that have had the given effect on the Ireland and Greece.
+
+# In[16]:
+
+
+regions = ['IRL', 'GRC']
+
+
+# In[17]:
+
+
+pop = wb.download(indicator='SP.POP.TOTL', country=regions, start=2010, end=2018)
+population=pop.rename(columns = {'SP.POP.TOTL' : 'population'})
+population
+
+
+# In[18]:
+
+
+year = [2010, 2011, 2012, 2013, 2014, 2015, 2016, 2017, 2018]
+pop_greece = [11121341, 11104899, 11045011, 10965211, 10892413, 10820883, 10775971, 10754679, 10727668]
+
+
+plt.plot(year, pop_greece, color='g')
+plt.xlabel('Greece')
+plt.ylabel('Population in million')
+plt.title('Population in Greece 2010-2018')
+plt.show()
+
+year = [2010, 2011, 2012, 2013, 2014, 2015, 2016, 2017, 2018]
+pop_Ireland =[4560155, 4580084, 4599533, 4623816, 4657740, 4701957, 4755335, 4807388, 4853506]
+plt.plot(year, pop_Ireland, color='orange')
+plt.xlabel('Ireland')
+plt.ylabel('Population in million')
+plt.title('Population in Ireland 2010-2018')
+plt.show()
+plt.tight_layout()
+
+
+# From the plots above, it is evident that the development in the population is very different for the two countries, hence the difference in annual GDP growth. 
+# 
+# Looking at the first plot, we see that the population for greece is declining. Greece has suffered severly from the economic crisis, which has lead to emigration, declining birth and an aging population. This results in lower GDP over the particular period.
+# 
+# For Ireland the situation is the absolute opposite. A rise in population has given rise to growing GDP over the period. A larger population can contribute to employment and thereby higher Gross Domestic Product. 
