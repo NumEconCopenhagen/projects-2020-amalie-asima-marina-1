@@ -1,6 +1,6 @@
 # Exam project
 
-Our project is titled Exam project spring 2020 and is about three problems, which we have solved using tools from the curriculum. We have used tools as Monte Carlo, numerical optimization, algorithms and many more  
+Our project is titled Exam project spring 2020 and is about three problems, which we have solved using tools from the curriculum. We have used tools as Monte Carlo, numerical optimization, algorithms and many more. 
 
 The **results** of the project can be seen from running [exam-project-.ipynb](exam-project-.ipynb).
 
