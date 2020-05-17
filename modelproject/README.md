@@ -4,4 +4,4 @@ Our project is titled The cournot model and is about modelling the instance wher
 
 The **results** of the project can be seen from running [modelproject-1.ipynb](modelproject.ipynb).
 
-**Dependencies:** Apart from a standard Anaconda Python 3 installation, its rquired importing the following packages from numpy, scipy, sympy and ipywidgets. 
+**Dependencies:** Apart from a standard Anaconda Python 3 installation, other installations are not required. 
